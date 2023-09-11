@@ -23,6 +23,18 @@ if __name__ == '__main__' :
 
     #反射器
     s[i]= chr(T[ord(s[i])-97]+97);
+
+    #扰频器组合（2转子）
+    for i in range(len(s)):
+        s[i]= chr(MID[ord(s[i])-97]+97);
+        s[i]= chr(QUICK[ord(s[i])-97]+97);
+        pos_quick = (pos_quick+1)%26;
+        if(pos_quick == 25):
+            pos_mid = (pos_mid+1)%26;
+    # print(s);
+
+    #接线板字符转换
+    s[i]= chr(S[ord(s[i])-97]+97);
     s = "".join(s)
     print(s);
         
