@@ -39,7 +39,7 @@ def Enigma(s): #输入明文字符串，输出加密后的列表
     s[i]= chr(S[ord(s[i])-97]+97)
     return s
 
-if __name__ == 'main':
+if __name__ == '__main__':
     s="wetter"
     print(s)
     a = Enigma(s)
