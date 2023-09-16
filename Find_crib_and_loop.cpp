@@ -93,7 +93,7 @@ std::list<int*>* find_loop(std::string crib_plain, std::string crib_cipher){
 int find_crib_and_loop_main(std::string plain, std::string cipher){
     //打开文件用于存储结果
     std::ofstream output_file;
-    output_file.open("output.txt");
+    output_file.open("crib_and_loop.txt");
     if(!output_file.is_open()){
         std::cerr<<"无法打开文件"<<std::endl;
         return 1;
