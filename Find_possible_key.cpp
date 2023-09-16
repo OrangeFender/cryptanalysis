@@ -1,4 +1,5 @@
 #include <list>
+#include "include.h"
 
 //int QUICK_R[26] = {0, 18, 24, 10, 12, 20, 8, 6, 14, 2, 11, 15, 22, 3, 25, 7, 17, 13, 1, 5, 23, 9, 16, 21, 19, 4};
 //int MID_R[26] = {0, 10, 4, 2, 8, 1, 18, 20, 22, 19, 13, 6, 17, 5, 9, 3, 24, 14, 12, 25, 21, 11, 7, 16, 15, 23};
@@ -73,15 +74,25 @@ bool ** find_possible_key(int loop_length, int * characteristic_array){
     return key;
 }
 
+//定义构造函数，以便下面的函数使用
+Key_Stecker::Key_Stecker(int mid_key, int quick_key){
+        key[0]=mid_key;
+        key[1]=quick_key;
+        for(int i=0;i<26;i++){
+            stecker[i]=i;
+        }
+    }
 /**
  * 利用同一个crib下两个相邻的环路来删除无效key
  * 
 */
-void delete_invalid_key_step1(bool **key){
-    bool key_25_25=key[25][25];
-    bool key_0_0=key[0][0];
+std::list<Key_Stecker*>* step1_select_valid_key(bool **key){
+    //创建链表来存储完整密钥
+    std::list<Key_Stecker*> *key_stecker_list=new std::list<Key_Stecker*>;
+
     for(int mid_key=25;mid_key>-1;mid_key--){
         for(int quick_key=25;quick_key>-1;quick_key--){
+            //本身存在成环通路
             if(key[mid_key][quick_key]==1){
                 //change *_key_tmp
                 int quick_key_tmp=quick_key;
@@ -90,14 +101,17 @@ void delete_invalid_key_step1(bool **key){
                     mid_key_tmp=(mid_key_tmp+25)%26;
                 }
                 quick_key_tmp=(quick_key_tmp+25)%26;
-                if(key[mid_key_tmp][quick_key_tmp]==0){
-                    key[mid_key][quick_key]=0;
+                //下一个也存在成环通路
+                if(key[mid_key_tmp][quick_key_tmp]==1){
+                    Key_Stecker *sk=new Key_Stecker(mid_key,quick_key);
+                    key_stecker_list->push_back(sk);
                 }
             }
         }
     }
-    //最后一个key的判断需要特殊处理
-    if(key_0_0==1 && key_25_25==1){
-        key[0][0]=1;
-    }
+    return key_stecker_list;
+}
+
+void delete_invalid_key_step2(bool **key){
+    
 }
