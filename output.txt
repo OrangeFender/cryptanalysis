@@ -1,0 +1,15 @@
+crib:
+plain is :
+wetter
+==============
+a cipher is:
+etrwpe
+--------------
+a loop in which is:
+we*t**
+et*w**
+--------------
+a loop in which is:
+*et**r
+*tr**e
+
