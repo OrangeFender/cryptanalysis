@@ -4,6 +4,7 @@
 #include <fstream>
 #include "include.h"
 
+
 /**
  * 寻找crib
  * 返回crib链表，每个节点用string存储crib中的密文

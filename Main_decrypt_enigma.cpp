@@ -48,7 +48,7 @@ int main_decrypt(std::ofstream &output_key0, std::ofstream &output_key1, std::of
         encrypt(ks_all,plain,plain.length(),&output_key2, initial_place);
     }
 
-    return 0;
+    return key_stecker_list->size();
 
 
     // std::ofstream output_key3;
@@ -105,10 +105,12 @@ int main(){
         return 1;
     }
 
+    int sum=0;
     //主函数
     for(int i=0;i<26;i++){
-        main_decrypt(output_key0, output_key1, output_key2, i);
+        sum=sum+main_decrypt(output_key0, output_key1, output_key2, i);
     }
+    std::cout<<sum;
 
     output_key0.close();
     output_key1.close();
