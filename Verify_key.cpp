@@ -3,7 +3,7 @@
 #include <iostream>
 #include <fstream>
 
-void encrypt(Key_Stecker* ks_all, std::string plain, int length, std::ofstream * output){
+void encrypt(Key_Stecker* ks_all, std::string plain, int length, std::ofstream * output, int initial_place){
     //初始化各种参数
     std::string cipher="";
     int *stecker=ks_all->stecker;
@@ -25,7 +25,7 @@ void encrypt(Key_Stecker* ks_all, std::string plain, int length, std::ofstream *
         cipher=cipher+char(tmp+'a');
 
         // change *_key
-        if (quick_key == 0)
+        if (quick_key == initial_place)
         {
         mid_key = (mid_key + 25) % 26;
         }

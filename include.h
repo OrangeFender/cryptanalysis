@@ -3,7 +3,7 @@
 #include<fstream>
 
 int rotors_and_reflector(int input, int mid_key, int quick_key);
-bool ** find_possible_key(int loop_length, int * characteristic_array);
+bool ** find_possible_key(int loop_length, int * characteristic_array, int initial_place);
 class Key_Stecker{
     public:
     int mid_key;
@@ -13,6 +13,6 @@ class Key_Stecker{
 
     Key_Stecker(int mid_key, int quick_key);
 };
-std::list<Key_Stecker*>* step1_select_valid_key(bool **key);
-std::list<Key_Stecker *> *step2_delete_invalid_key(std::list<Key_Stecker *> *key_stecker_list_pre, int loop_length, int *characteristic_array, std::string plain);
-void encrypt(Key_Stecker* ks_all, std::string plain, int length, std::ofstream * output);
+std::list<Key_Stecker*>* step1_select_valid_key(bool **key, bool **key2, int initial_place);
+std::list<Key_Stecker *> *step2_delete_invalid_key(std::list<Key_Stecker *> *key_stecker_list_pre, int loop_length, int *characteristic_array, std::string plain, int initial_place);
+void encrypt(Key_Stecker* ks_all, std::string plain, int length, std::ofstream * output, int initial_place);

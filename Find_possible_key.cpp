@@ -19,6 +19,7 @@ int rotors_and_reflector(int input, int mid_key, int quick_key)
     tmp = (QUICK_R[(input + quick_key) % 26] - quick_key + 26) % 26;
     // 过中速转子
     tmp = (MID_R[(tmp + mid_key) % 26] - mid_key + 26) % 26;
+    
     // 过反射器
     tmp = T_R[tmp];
     // 过逆中速转子
@@ -32,7 +33,7 @@ int rotors_and_reflector(int input, int mid_key, int quick_key)
 /**
  * 遍历所有key，找出可能的key
  */
-bool **find_possible_key(int loop_length, int *characteristic_array)
+bool **find_possible_key(int loop_length, int *characteristic_array, int initial_place)
 {
     // 创建26*26数组以保存key，key[4][4]==1说明(4,4)是其中一个key;
     bool **key = new bool *[26];
@@ -58,7 +59,7 @@ bool **find_possible_key(int loop_length, int *characteristic_array)
                     {
                         result_tmp = rotors_and_reflector(result_tmp, mid_key_tmp, quick_key_tmp);
                         // change *_key_tmp
-                        if (quick_key_tmp == 0)
+                        if (quick_key_tmp == initial_place)
                         {
                             mid_key_tmp = (mid_key_tmp + 25) % 26;
                         }
@@ -67,7 +68,7 @@ bool **find_possible_key(int loop_length, int *characteristic_array)
                     else
                     {
                         // change *_key_tmp
-                        if (quick_key_tmp == 0)
+                        if (quick_key_tmp == initial_place)
                         {
                             mid_key_tmp = (mid_key_tmp + 25) % 26;
                         }
@@ -100,7 +101,7 @@ Key_Stecker::Key_Stecker(int mid_key, int quick_key)
  * 利用同一个crib下两个相邻的环路来删除无效key
  *
  */
-std::list<Key_Stecker *> *step1_select_valid_key(bool **key)
+std::list<Key_Stecker *> *step1_select_valid_key(bool **key, bool **key2, int initial_place)
 {
     // 创建链表来存储预完整密钥
     std::list<Key_Stecker *> *key_stecker_list_pre = new std::list<Key_Stecker *>;
@@ -109,23 +110,11 @@ std::list<Key_Stecker *> *step1_select_valid_key(bool **key)
     {
         for (int quick_key = 25; quick_key > -1; quick_key--)
         {
-            // 本身存在成环通路
-            if (key[mid_key][quick_key] == 1)
+            // 本身存在成环通路,下一个也存在成环通路
+            if (key[mid_key][quick_key] == 1 && key2[mid_key][quick_key]==1)
             {
-                // change *_key_tmp
-                int quick_key_tmp = quick_key;
-                int mid_key_tmp = mid_key;
-                if (quick_key_tmp == 0)
-                {
-                    mid_key_tmp = (mid_key_tmp + 25) % 26;
-                }
-                quick_key_tmp = (quick_key_tmp + 25) % 26;
-                // 下一个也存在成环通路
-                if (key[mid_key_tmp][quick_key_tmp] == 1)
-                {
-                    Key_Stecker *ks = new Key_Stecker(mid_key, quick_key);
-                    key_stecker_list_pre->push_back(ks);
-                }
+                Key_Stecker *ks = new Key_Stecker(mid_key, quick_key);
+                key_stecker_list_pre->push_back(ks);
             }
         }
     }
@@ -160,20 +149,25 @@ bool set_stecker(int operand1, int operand2, Key_Stecker *all_ks, int *stecker_h
 /**
  * 用不在环中的字母做筛选
 */
-bool step3_find_valid_key(char from_letter, int to, int mid_key, int quick_key, int move, Key_Stecker *all_ks, int *stecker_help_array){
+bool step3_find_valid_key(char from_letter, int to, int mid_key, int quick_key, int move, Key_Stecker *all_ks, int *stecker_help_array, int initial_place){
     int from=from_letter-'a';
-    if (quick_key <move)
-    {
-        mid_key = (mid_key + 25) % 26;
+
+    // change *_key
+    for(int i=0;i<move;i++){
+        if (quick_key == initial_place )
+        {
+            mid_key = (mid_key + 25) % 26;
+        }
+        quick_key = (quick_key + 25) % 26;
     }
-    quick_key = (quick_key + 26-move) % 26;
+
     to=rotors_and_reflector(to,mid_key,quick_key);
     return set_stecker(from, to, all_ks, stecker_help_array);
 }
 /**
  * 恢复接线板同时进行密钥筛选
 */
-std::list<Key_Stecker *> *step2_delete_invalid_key(std::list<Key_Stecker *> *key_stecker_list_pre, int loop_length, int *characteristic_array, std::string plain)
+std::list<Key_Stecker *> *step2_delete_invalid_key(std::list<Key_Stecker *> *key_stecker_list_pre, int loop_length, int *characteristic_array, std::string plain, int initial_place)
 {
     // 创建链表来存储可能的完整密钥
     std::list<Key_Stecker *> *key_stecker_list = new std::list<Key_Stecker *>;
@@ -196,7 +190,7 @@ std::list<Key_Stecker *> *step2_delete_invalid_key(std::list<Key_Stecker *> *key
                     result[j] = result_tmp;
                     result_tmp = rotors_and_reflector(result_tmp, mid_key_tmp, quick_key_tmp);
                     // change *_key_tmp
-                    if (quick_key_tmp == 0)
+                    if (quick_key_tmp == initial_place)
                     {
                         mid_key_tmp = (mid_key_tmp + 25) % 26;
                     }
@@ -205,7 +199,7 @@ std::list<Key_Stecker *> *step2_delete_invalid_key(std::list<Key_Stecker *> *key
                 else
                 {
                     // change *_key_tmp
-                    if (quick_key_tmp == 0)
+                    if (quick_key_tmp == initial_place)
                     {
                         mid_key_tmp = (mid_key_tmp + 25) % 26;
                     }
@@ -230,9 +224,9 @@ std::list<Key_Stecker *> *step2_delete_invalid_key(std::list<Key_Stecker *> *key
                     }
                 }
                 //这是一个写死的函数，不同crib需要不同的函数，作用是用crib中不在环路内的字母给密钥做筛选
-                is_valid=is_valid & step3_find_valid_key('r',result[3],ks->mid_key,ks->quick_key,2,all_ks, stecker_help_array);
-                is_valid=is_valid & step3_find_valid_key('p',result[1],ks->mid_key,ks->quick_key,4,all_ks, stecker_help_array);
-                is_valid=is_valid & step3_find_valid_key('r',result[1],ks->mid_key,ks->quick_key,5,all_ks, stecker_help_array);
+                is_valid=is_valid & step3_find_valid_key('r',result[3],ks->mid_key,ks->quick_key,2,all_ks, stecker_help_array, initial_place);
+                is_valid=is_valid & step3_find_valid_key('p',result[1],ks->mid_key,ks->quick_key,4,all_ks, stecker_help_array, initial_place);
+                is_valid=is_valid & step3_find_valid_key('r',result[1],ks->mid_key,ks->quick_key,5,all_ks, stecker_help_array, initial_place);
                 
 
                 if(is_valid){
