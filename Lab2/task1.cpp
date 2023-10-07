@@ -44,7 +44,7 @@ static char S[8][64] = {{/* S1 */
     2, 1, 14, 7, 4, 10, 8, 13, 15, 12, 9, 0, 3, 5, 6, 11}};
 
 char s_output(int &k, int &m){
-    return S[k][(((m & 0b100000) >> 4) + (m & 0b1) - 1) * 16 + ((m & 0b11110) >> 1)];
+    return S[k][(((m & 0b100000) >> 4) + (m & 0b1)) * 16 + ((m & 0b11110) >> 1)];
 } // S盒置换
 
 int main(){
@@ -55,7 +55,7 @@ int main(){
         {
             for (int j = 0; j < 64; j++) // 输入明文2
             {
-                p[i ^ j][static_cast<int>(s_output(k, i) ^ s_output(k, j))]++; // 统计差分概率
+                p[i ^ j][s_output(k, i) ^ s_output(k, j)]++; // 统计差分概率
             }
         }
 
