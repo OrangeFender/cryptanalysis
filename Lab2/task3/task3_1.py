@@ -110,7 +110,9 @@ def attacker(delta,ctpair,a):
     a_inv=p(a,inverse_p)
     a_inv_4bit=split_into_4bit_blocks(a_inv)
     
-    counter=[[0]*64*64]*4
+    counter=[]
+    for _ in range(4):
+        counter.append([0]*4096)
     
     for key in range(64*64):
         #for i in range(len(ctpair)):
@@ -125,8 +127,8 @@ def attacker(delta,ctpair,a):
             r1e_6bit=split_into_6bit_blocks(r1e)
             r2e_6bit=split_into_6bit_blocks(r2e)
             for n_of_s in range(4):
-                Delta_a_l=(l1_inv_4bit[2*n_of_s]^l2_inv_4bit[2*n_of_s]^a_inv_4bit[2*n_of_s])<<4|l1_inv_4bit[2*n_of_s+1]^l2_inv_4bit[2*n_of_s+1]^a_inv_4bit[2*n_of_s+1]
-                D1=(s[2*n_of_s][(r1e_6bit[2*n_of_s]^(key>>6))]^s[2*n_of_s][(r2e_6bit[2*n_of_s]^(key>>6))])<<4|s[2*n_of_s+1][(r1e_6bit[2*n_of_s+1]^(key&0b111111))]^s[2*n_of_s+1][(r2e_6bit[2*n_of_s+1]^(key&0b111111))]#求出D的输出差分
+                Delta_a_l=((l1_inv_4bit[2*n_of_s]^l2_inv_4bit[2*n_of_s]^a_inv_4bit[2*n_of_s])<<4)|(l1_inv_4bit[2*n_of_s+1]^l2_inv_4bit[2*n_of_s+1]^a_inv_4bit[2*n_of_s+1])
+                D1=(((s[2*n_of_s][(r1e_6bit[2*n_of_s]^(key>>6))]^s[2*n_of_s][(r2e_6bit[2*n_of_s]^(key>>6))]))<<4)|(s[2*n_of_s+1][(r1e_6bit[2*n_of_s+1]^(key&0b111111))]^s[2*n_of_s+1][(r2e_6bit[2*n_of_s+1]^(key&0b111111))])#求出D的输出差分
                 DeltaB=D1^Delta_a_l
                 if DeltaB in delta[n_of_s]:
                     counter[n_of_s][key]=counter[n_of_s][key]+1
@@ -152,7 +154,10 @@ Delta[3]=[0]
 
 counter=attacker(Delta,cipher_pair_list,a)
 
-print(counter)
+with open("counter.txt", "w") as file:
+    # 将整个列表以包括括号的形式写入文件
+    file.write(str(counter))
+
 print("-----------------------------------------")
 for i in range(len(counter)):
     print(sorted(counter[i]))

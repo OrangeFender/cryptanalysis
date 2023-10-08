@@ -114,6 +114,7 @@ def attacker(delta,ctpair,a):
     
     for key in range(64):
         for i in range(len(ctpair)):
+        #for i in range(10000):
             l1_inv=p(ctpair[i][0][0],inverse_p)
             l2_inv=p(ctpair[i][1][0],inverse_p)
             #进行逆p置换，方便后续恢复
@@ -125,11 +126,10 @@ def attacker(delta,ctpair,a):
             r2e_6bit=split_into_6bit_blocks(r2e)
             for n_of_s in range(8):
                 Delta_a_l=l1_inv_4bit[n_of_s]^l2_inv_4bit[n_of_s]^a_inv_4bit[n_of_s]
-                D1=s[n_of_s][r1e_6bit[n_of_s]]^s[n_of_s][r2e_6bit[n_of_s]]#求出D的输出差分
+                D1=s[n_of_s][(r1e_6bit[n_of_s]^key)]^s[n_of_s][(r2e_6bit[n_of_s]^key)]#求出D的输出差分
                 DeltaB=D1^Delta_a_l
                 if DeltaB in delta[n_of_s]:
-                    counter[n_of_s][key]+=1
-            
+                    counter[n_of_s][key]=counter[n_of_s][key]+1
             
     return counter
 
@@ -138,6 +138,7 @@ import json
 
 with open('cipher_pair_list.json', 'r') as file:
     cipher_pair_list = json.load(file)
+
 
 a=0x04000000
 
