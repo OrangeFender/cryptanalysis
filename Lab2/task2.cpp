@@ -1,7 +1,6 @@
 #include <iostream>
 #include <random>
 #include <iomanip>
-#include <map>
 using namespace std;
 
 #define LB32_MASK   0x00000001
@@ -308,8 +307,12 @@ int main() {
     uint64_t input_d = 12;
     // ==============================设置输入差分==========================
 
+    // ==============================设置输出差分==========================
+    uint64_t output_d = 666;
+    // ==============================设置输出差分==========================
+
     // ==============================设置相应概率的上标小p==========================
-    uint64_t index_p = 2;
+    uint64_t index_p = -4;
     // ==============================设置相应概率的上标小p==========================
 
     // uint64_t input = 0x0123456789ABCDEF;
@@ -320,8 +323,7 @@ int main() {
     // 随机选取10组不同的密钥
     for (int i = 0; i < 10;i++){
         key = dis(gen);
-
-        map<uint64_t,int> m = {};
+        int res = 0;
         // 随机选取2^(-p+8)对满足输入差分的明文对
         for (int k = 0; k < pow(2, 8 - index_p); k++){
             // 生成随机明文
@@ -331,15 +333,11 @@ int main() {
             // 输入3轮des算法，得到相应的输出对
             uint64_t result1 = des(input1, key, round, 'e');
             uint64_t result2 = des(input2, key, round, 'e');
-            m[result1 ^ result2]++; // 统计输出差分频率
+            if((result1^result2)==output_d)res++; // 统计输出差分频率
         }
 
         cout << "第" << i + 1 << "组" << ":" << endl;
-        for (const auto &ele : m)
-        {
-            std::cout <<hex<< "输出差分: " << ele.first << " 频率: " <<oct<< ele.second << std::endl;
-        }
-        cout << endl;
+        cout  << " 频率: " << res << endl<<endl;
     }
 
     return 0;
