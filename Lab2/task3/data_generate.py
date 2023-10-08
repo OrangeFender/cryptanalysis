@@ -27,6 +27,7 @@ for i in range(25600):
     cipher = subprocess.check_output(command, stderr=subprocess.STDOUT, text=True)
     cipher_friend = subprocess.check_output(command, stderr=subprocess.STDOUT, text=True)
     
+    #构造存储单元
     cipher_l=int(cipher[:8],16)
     cipher_r=int(cipher[8:],16)
     cipher=(cipher_l, cipher_r)
@@ -38,5 +39,6 @@ for i in range(25600):
     cipher_pair=(cipher, cipher_friend)
     cipher_pair_list.append(cipher_pair)
 
+#保存list对象，用于协同工作
 with open('cipher_pair_list.json','w') as file:
     json.dump(cipher_pair_list, file)
