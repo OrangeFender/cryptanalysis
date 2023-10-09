@@ -53,23 +53,37 @@ D=rotate_left(D,10)
 CD=C+D
 
 for i in range(48):
-    result.append(CD[PC2[i]-1])
+    result.append(CD[PC2[i]-1]-1)
     
 print(result)
+print(len(result))
 
 rest=[]
-for i in range(56):
-    if i not in result:
-        rest.append(i+1)
+for i in range(64):
+    if i not in result and i %8 != 7:
+        rest.append(i)
 
-main_key=[0]*56
-        
-for key in range(256):
-    keybits=int_to_binary_list(key)
+print(rest)
+
+key = [0]*64
+inputkey=0x270686dd4e0b
+mainkey = list("00"+bin(inputkey)[2:]) #48bits 字符串
+for i in range(48):
+    key[result[i]]=int(mainkey[i])
+for restkey in range(256):
+    keybits=int_to_binary_list(restkey)
     for i in range(8):
-        main_key[rest[i]-1]=keybits[i]
-    for i in range(48):
-        main_key[result[i]-1]=subkeybits[i]
-        
-    for i in range(56):
+        key[rest[i]] = keybits[i]
+    i=0
+    tmp=1
+    #计算奇偶校验位
+    while(i<64):
+        tmp^=key[i]
+        i+=1
+        if(i%8==7):
+            key[i]=tmp
+            tmp=1
+            i+=1
+    print(hex(int(''.join(map(str,key)),2))[2:],",")
+
         
