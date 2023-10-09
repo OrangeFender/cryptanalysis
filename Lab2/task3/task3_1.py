@@ -105,7 +105,8 @@ def split_into_6bit_blocks(input_number):
         blocks[i] = block_value
 
     return blocks
-
+def shift(a):
+    return ((((a&0b100000)>>4)+(a&0b000001))<<4)|((a&0b011110)>>1)
 def attacker(delta,ctpair,a):
     a_inv=p(a,inverse_p)
     a_inv_4bit=split_into_4bit_blocks(a_inv)
@@ -116,7 +117,7 @@ def attacker(delta,ctpair,a):
     
     for key in range(64*64):
         #for i in range(len(ctpair)):
-        for i in range(4000):
+        for i in range(1000):
             l1_inv=p(ctpair[i][0][0],inverse_p)
             l2_inv=p(ctpair[i][1][0],inverse_p)
             #进行逆p置换，方便后续恢复
@@ -128,7 +129,7 @@ def attacker(delta,ctpair,a):
             r2e_6bit=split_into_6bit_blocks(r2e)
             for n_of_s in range(4):
                 Delta_a_l=((l1_inv_4bit[2*n_of_s]^l2_inv_4bit[2*n_of_s]^a_inv_4bit[2*n_of_s])<<4)|(l1_inv_4bit[2*n_of_s+1]^l2_inv_4bit[2*n_of_s+1]^a_inv_4bit[2*n_of_s+1])
-                D1=(((s[2*n_of_s][(r1e_6bit[2*n_of_s]^(key>>6))]^s[2*n_of_s][(r2e_6bit[2*n_of_s]^(key>>6))]))<<4)|(s[2*n_of_s+1][(r1e_6bit[2*n_of_s+1]^(key&0b111111))]^s[2*n_of_s+1][(r2e_6bit[2*n_of_s+1]^(key&0b111111))])#求出D的输出差分
+                D1=(((s[2*n_of_s][shift(r1e_6bit[2*n_of_s]^(key>>6))]^s[2*n_of_s][shift(r2e_6bit[2*n_of_s]^(key>>6))]))<<4)|(s[2*n_of_s+1][shift(r1e_6bit[2*n_of_s+1]^(key&0b111111))]^s[2*n_of_s+1][shift(r2e_6bit[2*n_of_s+1]^(key&0b111111))])#求出D的输出差分
                 DeltaB=D1^Delta_a_l
                 if DeltaB in delta[n_of_s]:
                     counter[n_of_s][key]=counter[n_of_s][key]+1
@@ -144,13 +145,12 @@ with open('cipher_pair_list.json', 'r') as file:
 
 a=0x04000000
 
-Delta=[[]]*4
+Delta=[]
 
-Delta[0]=[3*4]#由s1分布表得
-
-Delta[1]=[0b10100101,0b10100110,0b10101001,0b10101010]
-Delta[2]=[0]
-Delta[3]=[0]
+Delta.append([3<<4])#由s1分布表得
+Delta.append([0b10010110,0b10011001])#由联合分布表得
+Delta.append([0])
+Delta.append([0])
 
 counter=attacker(Delta,cipher_pair_list,a)
 
