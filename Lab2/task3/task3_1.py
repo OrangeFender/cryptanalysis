@@ -119,7 +119,7 @@ def attacker(delta,ctpair,a):
     
     for key in range(64*64):
         #for i in range(len(ctpair)):
-        for i in range(4000):
+        for i in range(200):
             l1_inv=p(ctpair[i][0][0],inverse_p)
             l2_inv=p(ctpair[i][1][0],inverse_p)
             #进行逆p置换，方便后续恢复
@@ -180,26 +180,8 @@ Delta.append([0b10010110,0b10011001])#由联合分布表得
 Delta.append([0])
 Delta.append([0])
 
-#counter=attacker(Delta,cipher_pair_list,a)
-counter=[]
-NUM_THREADS = 4
+counter=attacker(Delta,cipher_pair_list,a)
 
-counter=[]
-for _ in range(4):
-    counter.append([0]*4096)
-
-# 创建并启动线程
-threads = []
-for i in range(NUM_THREADS):
-    thread = threading.Thread(target=thread_attacker, args=(Delta, cipher_pair_list, a, i,counter))
-    threads.append(thread)
-    thread.start()
-
-# 等待所有线程完成
-for thread in threads:
-    thread.join()
-
-counter.append
 with open("counter.txt", "w") as file:
     # 将整个列表以包括括号的形式写入文件
     file.write(str(counter))
