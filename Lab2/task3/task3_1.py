@@ -1,3 +1,5 @@
+import threading
+
 p_permutation_table = [
     16,  7, 20, 21,
     29, 12, 28, 17,
@@ -117,7 +119,7 @@ def attacker(delta,ctpair,a):
     
     for key in range(64*64):
         #for i in range(len(ctpair)):
-        for i in range(1000):
+        for i in range(4000):
             l1_inv=p(ctpair[i][0][0],inverse_p)
             l2_inv=p(ctpair[i][1][0],inverse_p)
             #进行逆p置换，方便后续恢复
@@ -136,7 +138,33 @@ def attacker(delta,ctpair,a):
             
     return counter
 
+def thread_attacker(delta,ctpair,a,n_of_s,counter):
+    a_inv=p(a,inverse_p)
+    a_inv_4bit=split_into_4bit_blocks(a_inv)
+    
+    counter=[0]*4096
 
+    
+    for key in range(64*64):
+        #for i in range(len(ctpair)):
+        for i in range(4000):
+            l1_inv=p(ctpair[i][0][0],inverse_p)
+            l2_inv=p(ctpair[i][1][0],inverse_p)
+            #进行逆p置换，方便后续恢复
+            l1_inv_4bit=split_into_4bit_blocks(l1_inv)
+            l2_inv_4bit=split_into_4bit_blocks(l2_inv)
+            r1e=e_expand(ctpair[i][0][1])
+            r2e=e_expand(ctpair[i][1][1])
+            r1e_6bit=split_into_6bit_blocks(r1e)
+            r2e_6bit=split_into_6bit_blocks(r2e)
+            
+            Delta_a_l=((l1_inv_4bit[2*n_of_s]^l2_inv_4bit[2*n_of_s]^a_inv_4bit[2*n_of_s])<<4)|(l1_inv_4bit[2*n_of_s+1]^l2_inv_4bit[2*n_of_s+1]^a_inv_4bit[2*n_of_s+1])
+            D1=(((s[2*n_of_s][shift(r1e_6bit[2*n_of_s]^(key>>6))]^s[2*n_of_s][shift(r2e_6bit[2*n_of_s]^(key>>6))]))<<4)|(s[2*n_of_s+1][shift(r1e_6bit[2*n_of_s+1]^(key&0b111111))]^s[2*n_of_s+1][shift(r2e_6bit[2*n_of_s+1]^(key&0b111111))])#求出D的输出差分
+            DeltaB=D1^Delta_a_l
+            if DeltaB in delta[n_of_s]:
+                counter[key]=counter[key]+1
+            
+    return
 import json
 
 with open('cipher_pair_list.json', 'r') as file:
@@ -152,8 +180,26 @@ Delta.append([0b10010110,0b10011001])#由联合分布表得
 Delta.append([0])
 Delta.append([0])
 
-counter=attacker(Delta,cipher_pair_list,a)
+#counter=attacker(Delta,cipher_pair_list,a)
+counter=[]
+NUM_THREADS = 4
 
+counter=[]
+for _ in range(4):
+    counter.append([0]*4096)
+
+# 创建并启动线程
+threads = []
+for i in range(NUM_THREADS):
+    thread = threading.Thread(target=thread_attacker, args=(Delta, cipher_pair_list, a, i,counter))
+    threads.append(thread)
+    thread.start()
+
+# 等待所有线程完成
+for thread in threads:
+    thread.join()
+
+counter.append
 with open("counter.txt", "w") as file:
     # 将整个列表以包括括号的形式写入文件
     file.write(str(counter))
