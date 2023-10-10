@@ -119,7 +119,7 @@ def attacker(delta,ctpair,a):
     
     for key in range(64*64):
         #for i in range(len(ctpair)):
-        for i in range(200):
+        for i in range(2000):
             l1_inv=p(ctpair[i][0][0],inverse_p)
             l2_inv=p(ctpair[i][1][0],inverse_p)
             #进行逆p置换，方便后续恢复
