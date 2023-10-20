@@ -75,6 +75,10 @@ def lat(s,m,n):
 ss = [14,4,13,1,2,15,11,8,3,10,6,12,5,9,0,7]
 
 # res = lat(ss,4,4)
-res = lat(S[4],6,4)
 
-print(res)
+for i in range(8):
+    print("-------------%d------------"%(i+1))
+    res = lat(S[i],6,4)
+    for j in range(2**6):
+        print(j,":",res[j])
+    
