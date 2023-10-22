@@ -129,26 +129,42 @@ def shift(a):
 def Nthbit(a,n):
     return (a>>n)&1
 
-def attacker(keys,plaintext,ciphertext,counter):
+def attacker(keys,plaintext,ciphertext):
     counter=[0]*len(keys)
-    startpoint=random.randint(0,30000)
-    for i in range(startpoint,startpoint+360):
-        c1=Nthbit(plaintext[i][0],4-1)^Nthbit(plaintext[i][1],3-1)^Nthbit(plaintext[i][1],4-1)^Nthbit(plaintext[i][1],7-1)^Nthbit(plaintext[i][1],16-1)^Nthbit(plaintext[i][1],20-1)^Nthbit(plaintext[i][1],21-1)^Nthbit(plaintext[i][1],32-1)
-        CRE_6bit=split_into_6bit_blocks(e_expand(ciphertext[i][1]))[2:]#这里切掉前两个s盒
+    startpoint=random.randint(0,30000-2500)
+    for i in range(startpoint,startpoint+2500):
+        #print(i)
+        c1=Nthbit(plaintext[i][0],4-1)^Nthbit(plaintext[i][1],9-1)^Nthbit(plaintext[i][1],17-1)^Nthbit(plaintext[i][1],20-1)^Nthbit(plaintext[i][1],24-1)^Nthbit(plaintext[i][1],31-1)
+        CRE_6bit=split_into_6bit_blocks(e_expand(ciphertext[i][1]))
         for j in range(len(keys)):
-            key_6bit=split_into_6bit_blocks(keys[j])#这里不用切片
-            afterSbox3=S[2][shift(CRE_6bit[0]^key_6bit[0])]    
-            afterSbox4=S[3][shift(CRE_6bit[1]^key_6bit[1])]
-            afterSbox5=S[4][shift(CRE_6bit[2]^key_6bit[2])]
-            afterSbox6=S[5][shift(CRE_6bit[3]^key_6bit[3])]
-            afterSbox7=S[6][shift(CRE_6bit[4]^key_6bit[4])]
-            afterSbox8=S[7][shift(CRE_6bit[5]^key_6bit[5])]
-            c2=Nthbit(ciphertext[i][0],4-1)^Nthbit(afterSbox3,2-1)^Nthbit(afterSbox4,2-1)^Nthbit(afterSbox5,4-1)^Nthbit(afterSbox6,1-1)^Nthbit(afterSbox7,1-1)^Nthbit(afterSbox7,4-1)^Nthbit(afterSbox8,4-1)
+            key_6bit=split_into_6bit_blocks(keys[j])
+            afterSbox1=S[0][shift(CRE_6bit[0]^key_6bit[0])]    
+            
+            afterSbox3=S[2][shift(CRE_6bit[2]^key_6bit[1])]
+            afterSbox4=S[3][shift(CRE_6bit[3]^key_6bit[2])]
+            
+            c2=Nthbit(ciphertext[i][1],4-1)^Nthbit(afterSbox1,1-1)^Nthbit(afterSbox1,2-1)^Nthbit(afterSbox1,4-1)^Nthbit(afterSbox3,1-1)^Nthbit(afterSbox4,2-1)
             if c1==c2:
                 counter[j]=counter[j]+1
+    return counter
     
 keyslist=[]
 with open("keys.txt", "r") as file:
     for line in file:
         keyslist.append(int(line.strip()))
-attacker
+
+import json
+with open("plain_list.json", "r") as file:
+    plain_list=json.load(file)
+with open("cipher_list.json", "r") as file:
+    cipher_list=json.load(file)
+    
+
+success=0
+for _ in range(100):    
+    counter=attacker(keyslist,plain_list,cipher_list)
+    print(sorted(counter))
+    #print(counter[66])
+    if counter[66]<=sorted(counter)[50]:
+        success+=1
+print('成功率为',success/100)
