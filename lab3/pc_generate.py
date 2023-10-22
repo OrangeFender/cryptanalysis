@@ -35,7 +35,7 @@ for i in range(30000):
     
 #保存list对象，用于协同工作
 with open('plain_list.json','w') as file_p:
-    json.dump(cipher_list, file_p)
+    json.dump(plain_list, file_p)
 
 with open('cipher_list.json','w') as file_c:
     json.dump(cipher_list, file_c)
