@@ -45,9 +45,13 @@ def mainkey(key):
 
     return subkey
 
+
 key = 0x82793e7900000000
-kk = bin(key)[2:]
+kk = bin(key)[2:].rjust(64,'0')
 kk = list(kk[:32]) + ['*']*32
+
+# 结果中使用*代表未知的密钥bit
+# subkey 包含所有轮密钥，使用0-15索引
 subkey = mainkey(kk)
 
 
