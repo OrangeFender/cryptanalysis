@@ -54,7 +54,7 @@ kk = list(kk[:32]) + ['*']*32
 # subkey 包含所有轮密钥，使用0-15索引
 subkey = mainkey(kk)
 
-
+print("".join(subkey[5][12:]))
 
 
     
