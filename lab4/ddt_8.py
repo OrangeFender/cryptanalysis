@@ -42,7 +42,7 @@ def ballet_ddt_gen():
             dout = ((x + y +1 )&0xff) ^ ((x_ + y_+1)&0xff)
             ddt4[din][dout]+=1
 
-    ddt = ddt1*((1-p)**2)+ddt2*(2*p*(1-p))+ddt3*(p**2)
+    ddt = ddt1*((1-p)**2)+ddt2*(p*(1-p))+ddt3*(p*(1-p))+ddt4*(p**2)
     ddt_int = np.around(ddt) # 四舍五入
     return ddt_int
 
