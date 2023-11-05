@@ -1,11 +1,11 @@
 import numpy as np
 def calculatep():
     count = 0
-    for i in range(256):
-        for j in range(256):
-            if (i+j)>=256 :
+    for i in range(16):
+        for j in range(16):
+            if (i+j)>=16 :
                 count+=1
-    p = count / 65536
+    p = count / 256
     return p
 
 def ballet_ddt_gen():
